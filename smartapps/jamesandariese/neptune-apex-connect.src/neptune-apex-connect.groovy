@@ -36,9 +36,19 @@ def page1() {
 	atomicState.done = null
     dynamicPage(name: "page1", "title": "Connect", nextPage: "page2", uninstall: true, install: false) {
 		section("Connection") {
-			input("name": "ip", type: "text", title: "IP")
-        	input("name": "username", type: "text", title: "Username")
-        	input("name": "password", type: "password", "title": "Password")
+			input("name": "ip", type: "text", title: "IP", description: "A static IP is recommended")
+        	input("name": "username", type: "text", title: "Username", description: "(not your Apex Fusion username)")
+        	input("name": "password", type: "password", "title": "Password", description: "(not your Apex Fusion password)")
+
+        }
+        section("Setup Requirements") {
+            paragraph("You will need to have enabled LAN access on your controller for this to work.\nLAN access or Classic Dashboard is not the same as Apex Fusion and must be setup separately.")
+            href(name: "classicDashboard",
+            	title: "Classic Dashboard Setup",
+            	required: false,
+            	style: "external",
+            	url: "http://support.neptunesystems.com/support/solutions/articles/3000017576-how-to-access-your-classic-dashboard-pc",
+            	description: "Tap to view setup instructions for Apex Classic Dashboard (LAN access)")
 		}
 	}
 }
