@@ -57,7 +57,7 @@ def on() {
 
 def off() {
 	log.debug "Executing 'off'"
-	parent.feedMode(5)
+	parent.feedMode(null)
 }
 
 def push() {
@@ -67,6 +67,11 @@ def push() {
 def updateFromApex(feedStatus) {
 	// looks like {name: 6, active: 43673}
     log.debug "${device.deviceNetworkId} - updateFromApex($feedStatus)"
+    if ((int)feedStatus.name == 0) {
+    	// 0 means off
+    	sendEvent(name: "switch", value: "off")
+        return
+    }
     def dniNumber = ((int)feedStatus.name) - 1
     def dniComp = "feed_$dniNumber"
     log.debug "is ${device.deviceNetworkId} == $dniComp?"
