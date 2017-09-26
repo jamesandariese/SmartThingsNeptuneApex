@@ -249,6 +249,11 @@ def feedMode(i) {
 	log.debug "Polling"
 	def auth = "$username:$password".bytes.encodeBase64()
     
+    def feedCycle = "Feed"
+    if (i == null) {
+        i = 0
+        feedCycle="Feed Cancel"
+    }
     def params = [
         "headers": [
             "HOST": "$ip:80",
@@ -257,7 +262,7 @@ def feedMode(i) {
         ],
         "method": "POST",
         "path": "/cgi-bin/status.cgi",
-        "body": "FeedCycle=Feed&FeedSel=$i&noResponse=1"
+        "body": "FeedCycle=$feedCycle&FeedSel=$i&noResponse=1"
     ]
     log.debug params
     sendHubCommand(new physicalgraph.device.HubAction(params, "$ip:80", [callback: handleFeedModeResponse]))
