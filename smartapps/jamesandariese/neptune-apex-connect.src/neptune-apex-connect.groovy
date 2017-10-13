@@ -197,6 +197,8 @@ def initialize() {
           	addChildDevice(typeMap[obj['type']], dni, null, [label: obj['name']])
         }
     }
+    
+    runEvery1Minute(poll)
 }
 
 def poll() {
