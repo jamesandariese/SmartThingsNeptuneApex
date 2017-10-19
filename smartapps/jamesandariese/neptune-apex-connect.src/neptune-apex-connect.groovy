@@ -189,6 +189,7 @@ def initialize() {
 	def typeMap = [
     	"Temp": "Neptune Apex Temp Probe",
         "feedMode": "Neptune Apex Feed Mode",
+        "outlet": "Neptune Apex Outlet",
     ]
     
     objects.each { dni, obj ->
@@ -248,7 +249,6 @@ def handleHubStatusResponse(resp) {
 }
 
 def feedMode(i) {
-	log.debug "Polling"
 	def auth = "$username:$password".bytes.encodeBase64()
     
     def feedCycle = "Feed"
@@ -267,9 +267,48 @@ def feedMode(i) {
         "body": "FeedCycle=$feedCycle&FeedSel=$i&noResponse=1"
     ]
     log.debug params
-    sendHubCommand(new physicalgraph.device.HubAction(params, "$ip:80", [callback: handleFeedModeResponse]))
+    sendHubCommand(new physicalgraph.device.HubAction(params, "$ip:80", [callback: handleCommandResponse]))
 }
 
-def handleFeedModeResponse(resp) {
+def handleCommandResponse(resp) {
 	poll()
+}
+
+def setApexOutput(did, value) {
+    // 0 = auto
+    // 1 = off
+    // 2 = on
+
+    log.debug "setApexOutput($did, $value)"
+    def auth = "$username:$password".bytes.encodeBase64()
+    
+    def child = getChildDevice(did)
+    def apexOutputName = child.currentApexOutputName
+    if (apexOutputName == null) {
+        log.debug "Couldn't find the current apexOutputName for $did"
+    }
+    def params = [
+        "headers": [
+            "HOST": "$ip:80",
+            "Authorization": "Basic $auth",
+            "Content-Type": "application/x-www-form-urlencoded"
+        ],
+        "method": "POST",
+        "path": "/cgi-bin/status.cgi",
+        "body": "${apexOutputName}_state=${value}&noResponse=1"
+    ]
+    log.debug params
+    sendHubCommand(new physicalgraph.device.HubAction(params, "$ip:80", [callback: handleCommandResponse]))
+}
+
+def outletOn(did) {
+	setApexOutput(did, 2)
+}
+
+def outletOff(did) {
+	setApexOutput(did, 1)
+}
+
+def outletAuto(did) {
+	setApexOutput(did, 0)
 }
